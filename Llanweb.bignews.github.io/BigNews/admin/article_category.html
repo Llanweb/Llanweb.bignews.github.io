@@ -14,6 +14,8 @@
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
+    <!-- 导入网络中间层 -->
+    <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -51,5 +53,179 @@
             </table>
         </div>
     </div>
+    <!-- 模态框 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 id="exampleModalLabel">新增分类</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <!-- 隐藏域  用户获取id -->
+                        <input type="hidden" id="hero" name="id">
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">名称:</label>
+                            <input type="text" class="form-control inp_name" id="recipient-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">Slug:</label>
+                            <input type="text" class="form-control inp_slug" id="recipient-name">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 模板引擎 -->
+    <script id="tbody_list" type="text/html">
+        {{each data v}}
+        <tr>
+            <td>{{v.name}}</td>
+            <td>{{v.slug}}</td>
+            <td class="text-center">
+                <a data-id="{{v.id}}" href="javascript:void(0);" data-toggle="modal" data-target="#myModal" class=" btn btn-info btn-xs">编辑</a>
+                <a data-id="{{v.id}}" href="javascript:void(0);" class="btn btn-danger btn-xs">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+
+    <script>
+        $(function () {
+            /*需求：
+              1.获取实时数据 渲染显示到页面
+              2.新增文章  实时更新数据
+              3.编辑文章  修改之后更新数据
+              4.删除文章   实时更新数据 
+            */
+
+
+            //获取实时数据 渲染显示到页面
+            $.ajax({
+                url: bigNews.admin_list,
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    //响应数据 渲染显示到页面
+                    $('.table tbody').html(template('tbody_list', backData));
+                }
+            });
+
+            //模态框展示
+            $('#myModal').on('show.bs.modal', function (e) {
+                var target = e.relatedTarget;
+                console.log(target);
+
+                //判断 点击新增
+                if (target == $('#xinzengfenlei')[0]) {
+                    $('#exampleModalLabel').text('新增分类');
+                    $('.btn-primary').text('新增');
+                } else { //点击编辑
+                    $('#exampleModalLabel').text('编辑分类');
+                    $('.btn-primary').text('修改');
+                    //获取名称
+                    $('.inp_name').val($(target).parents('tr').children().eq(0).text().trim());
+                    //获取slug
+                    $('.inp_slug').val($(target).parents('tr').children().eq(1).text().trim());
+                    //存储id值
+                    $('#hero').attr('name', $(target).attr('data-id'))
+                }
+            })
+
+
+            //取消按钮  
+            $('.btn-default').click(function () {
+                //文本内容重置   reset是DOM对象方法
+                $('.modal-body form')[0].reset();
+            })
+
+
+
+
+            //确认按钮 储存数据
+            $('.btn-primary').click(function () {
+                //判断  是新增
+                if ($(this).text() == '新增') {
+                    //ajax请求
+                    $.ajax({
+                        url: bigNews.admin_add,
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            name: $('.inp_name').val(),
+                            slug: $('.inp_slug').val(),
+                        },
+                        success: function (backData) {
+                            console.log(backData);
+                            //新增成功
+                            if (backData.code == 201) {
+                                //刷新页面
+                                window.location.reload();
+                            } else {
+                                alert(backData.msg)
+                            }
+                        }
+                    });
+                } else { //点击编辑
+                    // console.log($('#hero').attr('name'));
+                    //ajax请求
+                    $.ajax({
+                        url: bigNews.admin_catEdit,
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            id: $('#hero').attr('name'),
+                            name: $('.inp_name').val(),
+                            slug: $('.inp_slug').val()
+                        },
+                        success: function (backData) {
+                            console.log(backData);
+                            //修改成功
+                            if (backData.code == 200) {
+                                // 刷新页面
+                                window.location.reload();
+                            } else {
+                                alert(backData.msg)
+                            }
+                        }
+                    });
+                }
+            })
+
+
+
+            //注册删除点击事件  动态元素 需要用到事件委托
+            $('.table tbody').on('click', '.btn-danger', function () {
+                //获取参数
+                // console.log($(this).attr('data-id'));
+                
+                //ajax请求
+                $.ajax({
+                    url: bigNews.admin_delete,
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        id: $(this).attr('data-id')
+                    },
+                    success: function (backData) {
+
+                    }
+                });
+                alert('删除成功');
+                //刷新页面
+                window.location.reload();
+            })
+
+        })
+    </script>
+</body>
 
 </html>

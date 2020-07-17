@@ -13,6 +13,8 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 引入bootstrap的js文件 -->
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <!-- 导入网络中间层 -->
+    <script src="./libs/http.js"></script>
 
 </head>
 
@@ -104,16 +106,23 @@
                 dataType: 'json',
                 success: function (backData) {
                     console.log(backData);
-                    //同步用户名
-                    $('#inputEmail1').val(backData.data.username);
-                    //同步昵称
-                    $('#inputEmail2').val(backData.data.nickname);
-                    //同步邮箱
-                    $('#inputEmail3').val(backData.data.email);
+                    // //同步用户名
+                    // $('#inputEmail1').val(backData.data.username);
+                    // //同步昵称
+                    // $('#inputEmail2').val(backData.data.nickname);
+                    // //同步邮箱
+                    // $('#inputEmail3').val(backData.data.email);
                     //同步用户图标
                     $('.user_pic').attr('src', backData.data.userPic);
-                    //同步密码
-                    $('#inputEmail4').val(backData.data.password);
+                    // //同步密码
+                    // $('#inputEmail4').val(backData.data.password);
+
+                    //因为类名和属性名是一直的所有可以通过遍历的方式来添加
+                    for (var key in backData.data) {
+                        // console.log(key);
+                        $('.'+key).val(backData.data[key]);
+                    }
+
                 }
             });
 
