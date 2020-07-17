@@ -11,10 +11,13 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
+    <!-- 引入bootstrap的js文件 -->
+    <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
 
 </head>
 
 <body>
+   
     <div class="container-fluid">
         <div class="common_title">
             用户信息修改
@@ -44,7 +47,7 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input style="display: block" name="userPic" type="file" id="exampleInputFile">
+                        <input style="display: none" name="userPic" type="file" id="exampleInputFile">
                         <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
                         <br>
                         <label for="exampleInputFile">
@@ -62,12 +65,112 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success btn-edit">修改</button>
+                        <button type="submit" class="btn btn-success btn-edit sbt">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <!-- 模态框提示 -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">友情提示：</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <script>
+        $(function () {
+            /*需求
+            1.ajax请求获取用户数据
+            2.文件预览上传 
+            3.注册修改点击事件 提交编辑用户信息
+            */
+
+            //ajax请求获取用户数据
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/admin/user/detail',
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    //同步用户名
+                    $('#inputEmail1').val(backData.data.username);
+                    //同步昵称
+                    $('#inputEmail2').val(backData.data.nickname);
+                    //同步邮箱
+                    $('#inputEmail3').val(backData.data.email);
+                    //同步用户图标
+                    $('.user_pic').attr('src', backData.data.userPic);
+                    //同步密码
+                    $('#inputEmail4').val(backData.data.password);
+                }
+            });
+
+            //文件预览上传
+            //(1)给feil表单注册onchange事件，选择文件就会执行
+            $('#exampleInputFile').change(function () {
+                //(2)获取用户选择的文件   Dom原生语法：this.files[0]
+                var file = this.files[0];
+                //(3)根据file文件，转换成url路径
+                var url = URL.createObjectURL(file);
+                //(4)设置img标签的src属性为生成的url
+                $('.user_pic').attr('src', url);
+            })
+
+            //注册修改点击事件 提交编辑用户信息
+            $('.sbt').click(function (e) {
+                //阻止form表单的默认跳转
+                e.preventDefault();
+                //文件上传
+                //(1)创建formdata对象
+                var fd = new FormData($('form')[0]);
+                //(2)调用append()方法来追加数据
+                // //用户名
+                // fd.append('username', $('#inputEmail1').val() );
+                // //昵称
+                // fd.append('nickname',$('#inputEmail2').val() );
+                // //邮箱
+                // fd.append('email', $('#inputEmail3').val() );
+                // //用户图标
+                // fd.append('user_pic',$('.user_pic')[0].files );
+                // //密码
+                // fd.append('password',$('#inputEmail4').val());
+
+                //ajax请求
+                $.ajax({
+                    url: 'http://localhost:8080/api/v1/admin/user/edit',
+                    type: 'post',
+                    dataType: 'json',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (backData) {
+                        console.log(backData);
+                        // 模态框提示
+                        $('#myModal').modal();
+                        $('.modal-body>p').text('修改成功')
+                        $('#myModal').on('hidden.bs.modal', function (e) {
+                           //跳转到后台管理页面
+                           //因为网页时嵌套关系 window指向是user.html网页的window  需要修改指定为父元素页面index.html
+                            window.parent.location.href = './index.html';
+                        })                        
+                    }
+                });
+            })
+
+        })
+    </script>
 </body>
 
 </html>

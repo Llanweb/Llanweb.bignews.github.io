@@ -414,3 +414,6 @@ body{
 
 
 
+.menu .level01 .trans{
+    transform: rotate(0deg);
+}
