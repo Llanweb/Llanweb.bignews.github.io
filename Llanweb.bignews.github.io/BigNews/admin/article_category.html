@@ -64,7 +64,7 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <!-- 隐藏域  用户获取id -->
+                        <!-- 隐藏域  储存id -->
                         <input type="hidden" id="hero" name="id">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">名称:</label>
@@ -130,12 +130,12 @@
                     $('.btn-primary').text('新增');
                 } else { //点击编辑
                     $('#exampleModalLabel').text('编辑分类');
-                    $('.btn-primary').text('修改');
+                    $('.btn-primary').text('编辑');
                     //获取名称
                     $('.inp_name').val($(target).parents('tr').children().eq(0).text().trim());
                     //获取slug
                     $('.inp_slug').val($(target).parents('tr').children().eq(1).text().trim());
-                    //存储id值
+                    //隐藏域 存储id值
                     $('#hero').attr('name', $(target).attr('data-id'))
                 }
             })
@@ -152,7 +152,7 @@
 
             //确认按钮 储存数据
             $('.btn-primary').click(function () {
-                //判断  是新增
+                //判断  新增
                 if ($(this).text() == '新增') {
                     //ajax请求
                     $.ajax({
@@ -174,7 +174,7 @@
                             }
                         }
                     });
-                } else { //点击编辑
+                } else { //点击 编辑
                     // console.log($('#hero').attr('name'));
                     //ajax请求
                     $.ajax({
@@ -206,7 +206,7 @@
             $('.table tbody').on('click', '.btn-danger', function () {
                 //获取参数
                 // console.log($(this).attr('data-id'));
-                
+
                 //ajax请求
                 $.ajax({
                     url: bigNews.admin_delete,
@@ -216,12 +216,17 @@
                         id: $(this).attr('data-id')
                     },
                     success: function (backData) {
-
+                        // console.log(backData);
+                        if (backData.code == 204) {
+                            alert('删除成功');
+                            //刷新页面
+                            window.location.reload();
+                        }else{
+                            alert(backData.msg)
+                        }
                     }
                 });
-                alert('删除成功');
-                //刷新页面
-                window.location.reload();
+
             })
 
         })
