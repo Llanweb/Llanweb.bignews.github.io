@@ -64,8 +64,6 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <!-- 隐藏域  储存id -->
-                        <input type="hidden" id="hero" name="id">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">名称:</label>
                             <input type="text" class="form-control inp_name" id="recipient-name">
@@ -121,22 +119,25 @@
 
             //模态框展示
             $('#myModal').on('show.bs.modal', function (e) {
+                //获取弹出模态框的事件触发源
                 var target = e.relatedTarget;
                 console.log(target);
 
                 //判断 点击新增
                 if (target == $('#xinzengfenlei')[0]) {
+                    //清空form表单的内容
+                    $('.modal-body form')[0].reset();
                     $('#exampleModalLabel').text('新增分类');
                     $('.btn-primary').text('新增');
                 } else { //点击编辑
                     $('#exampleModalLabel').text('编辑分类');
                     $('.btn-primary').text('编辑');
                     //获取名称
-                    $('.inp_name').val($(target).parents('tr').children().eq(0).text().trim());
+                    $('.inp_name').val($(target).parent().prev().prev().text().trim());
                     //获取slug
-                    $('.inp_slug').val($(target).parents('tr').children().eq(1).text().trim());
-                    //隐藏域 存储id值
-                    $('#hero').attr('name', $(target).attr('data-id'))
+                    $('.inp_slug').val($(target).parent().prev().text().trim());
+                    // 存储id值
+                    $('.btn-primary').attr('name', $(target).attr('data-id'))
                 }
             })
 
@@ -182,7 +183,7 @@
                         type: 'post',
                         dataType: 'json',
                         data: {
-                            id: $('#hero').attr('name'),
+                            id: $(this).attr('name'),
                             name: $('.inp_name').val(),
                             slug: $('.inp_slug').val()
                         },

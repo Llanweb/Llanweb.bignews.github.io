@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>文章列表</title>
+    <title>新增文章列表</title>
     <link rel="stylesheet" href="./libs/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
@@ -14,6 +14,14 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 模板引擎 -->
     <script src="./libs/template-web.js"></script>
+    <!-- jeDate日期插件引入 -->
+    <link rel="stylesheet" href="./jedate-6.5.0/test/jeDate-test.css">
+    <link rel="stylesheet" href="./jedate-6.5.0/skin/jedate.css">
+    <script src="./jedate-6.5.0/src/jedate.js"></script>
+    <!--  编辑器插件引入 -->
+    <script src="./libs/wangEditor.min.js"></script>
+    <!-- 网络中间层引入 -->
+    <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -51,11 +59,22 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
                     <div class="col-sm-4">
+                        <!-- 时间插件样式结构 -->
+                        <div class="jeinpbox">
+                            <input type="text" class="jeinput" id="testico" placeholder="YYYY-MM-DD">
+                            <div class="icons jebtns"
+                                onclick="jeDate('#testico',{trigger:false,format: 'YYYY-MM-DD',zIndex:10001})">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
+                        <!-- 编辑器样式结构 -->
+                        <div id="editor">
+        
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -67,6 +86,106 @@
             </form>
         </div>
     </div>
+
+    <!-- 模板引擎 -->
+    <script id="opt_list" type="text/html">
+        {{each data v}}
+        <option value="{{ v.id}}">{{v.name}}</option>
+        {{/each}}
+    </script>
+
+    <script>
+        $(function () {
+            /*需求：
+            1.时间插件的导入
+            2.编辑器的导入
+            3.ajax请求 文章类别 渲染到页面
+            4.文件预览
+            5.注册点击事件 获取当前数据 ajax请求
+            6.提交新增 文件上传
+            */
+
+
+            //时间插件的导入
+            /* js初始化 */
+            jeDate("#testico", {
+                isinitVal: true,//默认显示当前时间
+                festival: true,//显示节假日
+                trigger: 'click',
+                format: "YYYY-MM-DD",
+                minDate: "2014-09-19 00:00:00",
+                zIndex: 10001
+            });
+
+            //编辑器的导入
+            var E = window.wangEditor
+            var editor = new E('#editor')
+            // 或者 var editor = new E( document.getElementById('editor') )
+            editor.create();
+
+            //ajax请求 文章类别 渲染到页面
+            $.ajax({
+                url: bigNews.admin_list,
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    //响应数据  渲染到页面
+                    $('.category').html(template('opt_list', backData))
+                }
+            });
+
+            //文件预览
+            //(1)给file表单注册onchange事件，选择文件就会执行
+            $('#inputCover').change(function () {
+                //(2)获取用户选择的文件，  DOM原生语法  this.files[0]
+                var file = this.files[0];
+                //(3)根据file文件  转换成url路径
+                var url = URL.createObjectURL(file);
+                //(4)设置img标签的src属性为生成的url
+                $('.article_cover').attr('src', url)
+            })
+
+            //注册点击事件  
+            $('.btn-release,.btn-draft').click(function (e) {
+               
+                //form表单阻止默认跳转行为
+                e.preventDefault();
+                //通过类名来判断 点击的是发布  还是 草稿
+                var state = $(this).hasClass('btn-release') == true ? '已发布' : '草稿';
+
+                //文件上传
+                //使用formData来上传文件数据
+                var fd = new FormData($('form')[0]);
+
+                //formDaat方法只能遍历获取form表单里的表单元素
+                //其他的参数需要手动添加
+                fd.append('date', $('#testico').val()); //日期
+                fd.append('content',editor.txt.text());//文章内容
+                fd.append('state',state);  //  发布或草稿
+
+
+                //ajax请求
+                $.ajax({
+                    url: bigNews.admin_publish,
+                    type: 'post',
+                    dataType: 'json',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (backData) {
+                        console.log(backData);
+                        if(backData.code == 200){
+                            alert(backData.msg);
+                            window.location.href = './article_list.html'
+                        }else{
+                            alert(backData.msg)
+                        }
+                    }
+                });
+            })
+        })
+    </script>
 </body>
 
 </html>

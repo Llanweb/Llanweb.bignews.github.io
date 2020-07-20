@@ -15,7 +15,7 @@
         admin_delete: baseURL + '/admin/category/delete',//删除文章类别
         admin_query: baseURL + '/admin/article/query',//文章搜索
         admin_publish: baseURL + '/admin/article/publish',//发布文章
-        admin_search: baseURL + '/admin/article/search',//根据id获取文章信息
+        admin_art_search: baseURL + '/admin/article/search',//根据id获取文章信息
         admin_artEdit: baseURL + '/admin/article/edit',//文章编辑
         admin_artDelete: baseURL + '/admin/article/delete',//删除文章
         admin_dataInfo: baseURL + '/admin/data/info',//获取统计数据
