@@ -251,13 +251,13 @@
    <!-- 文章搜索模板 -->
    <script id="sea_list" type="text/html">
     <div class="list_title">
-        <h3>科 技</h3>{{data.data.category}}
+        <h3>{{data.data[0].category}}</h3>
     </div>
     {{each data.data v}}
     <div class="common_news_list">
         <a href="#" class="list_pic"><img src="{{v.cover}}" alt=""></a>
         <h4><a href="#">{{v.title}} </a></h4>
-        <p>{{@ v.content.split('</p>')}}</p>
+        <p>{{@ v.content}}</p>
         <div class="new_info">
             <span>标签：{{v.category}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{v.read}}
                 )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{v.comments}} )</span>
@@ -304,6 +304,8 @@
                 }   
             });
         })
+
+        $('.search_btn').click();
     </script>
 </body>
 
