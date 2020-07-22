@@ -73,11 +73,12 @@
                 </tbody>
             </table>
             <div class="row text-center">
+                   <!-- 分页 -->
                 <ul id="pagination-demo" class="pagination-sm"></ul>
             </div>
         </div>
 
-        <!-- 分页 -->
+     
 
 
 
@@ -118,6 +119,7 @@
     5.点击发表文章  跳转到发表文章页面
     6.编辑文章  跳转到编辑文章页面
     7.注册删除点击事件   获取id值 ajax请求  刷新页面
+    8.点击右上角发表文章  右侧二级菜单发表文章高亮
     */
 
         //ajax请求
@@ -223,7 +225,10 @@
             });
         })
 
-
+        //点击右上角发表文章  右侧二级菜单发表文章高亮
+        $('#release_btn').click(function(){
+            $('.level02>li',window.parent.document).eq(1).click();
+        })
     })
 </script>
 

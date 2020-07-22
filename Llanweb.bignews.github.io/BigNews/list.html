@@ -12,6 +12,12 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="js/jquery.pagination.min.js"></script>
+    <!-- 模板引擎 -->
+    <script src="./js/template-web.js"></script>
+    <!-- jq -->
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <!-- 网络中间层 -->
+    <script src="./js/http.js"></script>
 </head>
 
 <body>
@@ -136,7 +142,8 @@
             </div>
 
             <div id="pagination" class="page"></div>
-            <script>
+            <!-- 分页 -->
+            <!-- <script>
                 $(function () {
                     $("#pagination").pagination({
                         currentPage: 2,
@@ -146,7 +153,7 @@
                         }
                     });
                 });
-            </script>
+            </script> -->
 
         </div>
         <div class="right_con setfl">
@@ -225,8 +232,79 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
         <p>电话：0755-****888 粤ICP备*******8号</p>
     </div>
-    <!-- 导包template -->
-    <script src="./js/template-web.js"></script>
+
+    <!-- 文章类型模板 -->
+    <script id="cat_list" type="text/html">
+        <li class="up"></li>
+       {{each data v}}
+       <li><a href="./list.html?id={{v.id}}">{{v.name}}</a></li>
+       {{/each}}
+   </script>
+
+    <!-- 导航栏模板 -->
+    <script id="nav_list" type="text/html">
+       {{each data v}}
+       <li><a href="#">{{v.name}}</a></li>
+       {{/each}}
+   </script>
+
+   <!-- 文章搜索模板 -->
+   <script id="sea_list" type="text/html">
+    <div class="list_title">
+        <h3>科 技</h3>{{data.data.category}}
+    </div>
+    {{each data.data v}}
+    <div class="common_news_list">
+        <a href="#" class="list_pic"><img src="{{v.cover}}" alt=""></a>
+        <h4><a href="#">{{v.title}} </a></h4>
+        <p>{{@ v.content.split('</p>')}}</p>
+        <div class="new_info">
+            <span>标签：{{v.category}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{v.read}}
+                )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{v.comments}} )</span>
+            <b>发布于 {{v.date}}</b>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+
+    <script>
+        /* 文章类型 */
+        $.ajax({
+            url: bigNews.index_category,
+            type: 'get',
+            dataType: 'json',
+            success: function (backData) {
+                // console.log(backData);
+                //响应数据 渲染到页面
+                $('.level_two').html(template('cat_list', backData))
+                $('.left_menu').html(template('nav_list', backData))
+            }
+        });
+
+        /* 文章搜索 */
+        //注册点击事件
+        $('.search_btn').click(function(){
+            //ajax请求
+            $.ajax({
+                url:bigNews.index_search,
+                type:'get',
+                dataType:'json',
+                data:{
+                    key:$('.search_txt').val(),
+                    type:window.location.href.split('=')[1],
+                    page:1,
+                    perpage:6
+                },
+                success: function(backData){
+                    console.log(backData);
+                    //响应数据 渲染到页面
+                    $('.left_con').html( template('sea_list',backData))
+                    $('.list_title h3').text(backData.data.data.category)
+                }   
+            });
+        })
+    </script>
 </body>
 
 </html>

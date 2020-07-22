@@ -36,7 +36,7 @@
         index_attention: baseURL + '/index/attention',//焦点关注 
         index_article: baseURL + '/index/article',//文章详细内容
         index_get_comment: baseURL + '/index/get_comment',//评论列表
-        index_postComment: baseURL + '/index/post_comment',//发表评论
+        index_post_comment: baseURL + '/index/post_comment',//发表评论
         index_search: baseURL + '/index/search',//文章搜索
 
     }

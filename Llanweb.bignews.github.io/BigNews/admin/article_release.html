@@ -152,7 +152,7 @@
                 //form表单阻止默认跳转行为
                 e.preventDefault();
                 //通过类名来判断 点击的是发布  还是 草稿
-                var state = $(this).hasClass('btn-release') == true ? '已发布' : '草稿';
+                var state = $(this).hasClass('btn-release') ? '已发布' : '草稿';
 
                 //文件上传
                 //使用formData来上传文件数据
